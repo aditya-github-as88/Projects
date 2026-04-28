@@ -1,0 +1,31 @@
+# Prompt Engineering Practice - Requirements
+# ------------------------------------------
+# This file supports two install modes:
+# 1. Minimal (core essentials)
+# 2. Full (extended dependencies for experiments, evaluation, visualization)
+
+# --- Minimal install ---
+openai>=1.0.0
+groq>=0.5.0
+transformers>=4.40.0
+numpy>=1.26.0
+
+# --- Full install (uncomment if needed) ---
+# datasets>=2.19.0
+# accelerate>=0.29.0
+# pandas>=2.2.0
+# scikit-learn>=1.4.0
+# matplotlib>=3.8.0
+# seaborn>=0.13.0
+# httpx>=0.27.0
+# aiohttp>=3.9.0
+# evaluate>=0.4.0
+
+# --- Install commands ---
+# To install minimal dependencies:
+#   pip install -r requirements.txt
+#
+# To install full dependencies:
+#   pip install -r requirements.txt --extra-index-url https://pypi.org/simple
+#   (then uncomment the full section above or run manually:)
+#   pip install datasets accelerate pandas scikit-learn matplotlib seaborn httpx aiohttp evaluate
