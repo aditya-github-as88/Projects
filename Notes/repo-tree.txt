@@ -1,0 +1,37 @@
+prompt-engineering-practice/
+│
+├── README.md                        # Overview, setup instructions, goals
+├── requirements.txt                  # Dependencies (e.g., openai, groq, transformers)
+│
+├── basics/                           # Section I: Getting Started
+│   ├── prompt_elements.py            # Instruction, context, input, output indicator examples
+│   ├── zero_shot.py                  # Zero-shot prompting demos
+│   ├── few_shot.py                   # Few-shot prompting demos
+│   └── role_based.py                 # Role/persona prompting examples
+│
+├── reasoning/                        # Section III: Prompting Techniques
+│   ├── chain_of_thought.py           # Step-by-step reasoning prompts
+│   ├── self_consistency.py           # Multiple reasoning paths, consistency selection
+│   └── instruction_tuning.py         # Refining prompts for alignment
+│
+├── advanced/                         # Section IV: Advanced Prompt Design
+│   ├── multi_turn.py                 # Multi-turn dialogue prompts
+│   ├── context_chaining.py           # Linking prompts across contexts
+│   ├── optimization.py               # Prompt optimization experiments
+│   └── evaluation_metrics.py         # Relevance, coherence, creativity, factual accuracy scoring
+│
+├── integration/                      # Section II: Groq API + tools
+│   ├── groq_api_demo.py              # Example of running prompts via Groq
+│   ├── realtime_inference.py         # Low-latency prompt execution
+│   └── api_utils.py                  # Helper functions for API calls
+│
+├── projects/                         # Section V: Practice Tasks
+│   ├── chatbot_demo.py               # Conversational assistant using multiple techniques
+│   ├── quiz_generator.py             # Flashcards / quiz prompts
+│   ├── creative_writer.py            # Poetry, storytelling prompts
+│   └── data_analysis.py              # Prompt-driven SQL/Python queries
+│
+└── experiments/                      # Sandbox for your own trials
+    ├── variations.py                 # Try different prompt styles
+    ├── results_logger.py             # Log outputs for comparison
+    └── reflections.md                # Notes on what worked best
