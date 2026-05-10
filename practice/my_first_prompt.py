@@ -4,14 +4,15 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from groq import Groq
+from config import GROQ_API_KEY
 
 MODEL_NAME = "openai/gpt-oss-20b"
 
 from basics.zero_shot import sentiment_analysis_zero_shot
 
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
-if not GROQ_API_KEY:
-    raise EnvironmentError("Missing GROQ_API_KEY environment variable")
+# GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
+# if not GROQ_API_KEY:
+#     raise EnvironmentError("Missing GROQ_API_KEY environment variable")
 
 def createGroqClient():
     groq_client = Groq(api_key=GROQ_API_KEY)
