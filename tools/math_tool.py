@@ -4,7 +4,7 @@ Handles all numeric weather unit conversions and calculations.
 No LLM inference — pure deterministic math.
 """
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 
 TOOL_SCHEMA = {
@@ -46,7 +46,7 @@ TOOL_SCHEMA = {
 }
 
 
-def run(operation: str, value: float, secondary_value: float = None) -> Dict[str, Any]:
+def run(operation: str, value: float, secondary_value: Optional[float] = None) -> Dict[str, Any]:
     """Execute the requested weather math operation."""
 
     ops = {

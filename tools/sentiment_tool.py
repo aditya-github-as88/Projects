@@ -47,9 +47,9 @@ TOOL_SCHEMA = {
 
 def run(
     temperature_c: float,
-    humidity_pct: float = None,
-    wind_kmh: float = None,
-    activity: str = None,
+    humidity_pct: Optional[float] = None,
+    wind_kmh: Optional[float] = None,
+    activity: Optional[str] = None,
     vulnerable_group: bool = False
 ) -> Dict[str, Any]:
 

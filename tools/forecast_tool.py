@@ -5,7 +5,7 @@ In production this would call an internal weather API.
 Here it uses rule-based logic as a stand-in.
 """
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 
 TOOL_SCHEMA = {
@@ -44,8 +44,8 @@ TOOL_SCHEMA = {
 def run(
     precipitation_pct: float,
     temperature_trend: str = "stable",
-    humidity_pct: float = None,
-    location_hint: str = None
+    humidity_pct: Optional[float] = None,
+    location_hint: Optional[str] = None
 ) -> Dict[str, Any]:
 
     precip_label  = _precipitation_label(precipitation_pct)
@@ -87,7 +87,7 @@ def _precipitation_advice(pct: float) -> str:
     return "Expect heavy rain. Avoid flood-prone areas. Stay updated on alerts."
 
 
-def _trend_outlook(trend: str, humidity: float) -> str:
+def _trend_outlook(trend: str, humidity: Optional[float]) -> str:
     if trend == "rising":
         if humidity and humidity > 70:
             return "Temperature rising with high humidity — increased discomfort expected. Watch for heat advisories."
