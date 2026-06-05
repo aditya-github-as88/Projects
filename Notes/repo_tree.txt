@@ -1,0 +1,68 @@
+LangChain/
+├── README.md
+├── requirements.txt
+├── pyproject.toml
+├── .gitignore
+├── docs/
+│   ├── index.md
+│   └── api_reference.md
+├── basics/
+│   ├── __init__.py
+│   ├── installation_and_setup.py
+│   ├── first_steps.py
+│   ├── core_concepts.py
+│   └── zero_shot_examples.py
+├── components/
+│   ├── models/
+│   │   ├── openai_models.py
+│   │   ├── huggingface_models.py
+│   │   └── custom_models.py
+│   ├── prompt_templates/
+│   │   ├── basic_templates.py
+│   │   ├── few_shot_templates.py
+│   │   └── advanced_customization.py
+│   ├── output_parsers/
+│   │   ├── json_parser.py
+│   │   ├── structured_parser.py
+│   │   └── custom_parsers.py
+│   ├── chains/
+│   │   ├── simple_chains.py
+│   │   ├── sequential_chains.py
+│   │   └── custom_chains.py
+│   ├── memory/
+│   ├── agents/
+│   ├── tools/
+│   └── indexes/
+├── advanced/
+│   ├── multi_modal_chains.py
+│   ├── fine_tuning.py
+│   ├── evaluation.py
+│   └── deployment.py
+├── reasoning/
+│   ├── chain_of_thought.py
+│   ├── self_consistency.py
+│   └── instruction_tuning.py
+├── integration/
+│   ├── api_utils.py
+│   ├── groq_api_demo.py
+│   ├── realtime_inference.py
+│   └── external_services.py
+├── experiments/
+│   ├── variations.py
+│   ├── results_logger.py
+│   └── reflections.md
+├── practice/
+│   ├── __init__.py
+│   ├── my_first_chain.py
+│   └── guided_tutorials/
+├── projects/
+│   ├── chatbot_demo.py
+│   ├── data_analysis.py
+│   ├── creative_writer.py
+│   ├── quiz_generator.py
+│   └── flower_delivery_assistant.py
+├── Notes/
+│   └── repo_tree.txt
+└── tests/
+    ├── test_models.py
+    └── test_chains.py
