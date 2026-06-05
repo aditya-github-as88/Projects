@@ -70,7 +70,7 @@ class PromptExperimentLogger:
         
         return comparison
     
-    def get_best_version(self, metric_name: str = "overall_quality") -> str:
+    def get_best_version(self, metric_name: str = "overall_quality") -> Optional[str]:
         """Get the best performing prompt version for a metric"""
         comparison = self.compare_versions()
         if not comparison:
