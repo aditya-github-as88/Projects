@@ -1,7 +1,18 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "mcp-server-demo"
+name = "langchain-learning"
 version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
-requires-python = ">=3.14"
-dependencies = []
+description = "A learning repository for LangChain"
+dependencies = [
+    "langchain",
+    "openai",
+    "langchain-openai",
+    "langchain-community",
+    "langchain-core"
+]
+
+[tool.setuptools]
+packages = ["basics", "components", "advanced", "reasoning", "integration", "practice", "projects", "experiments", "tests"]
