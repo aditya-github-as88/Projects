@@ -12,22 +12,22 @@ Always run skills in order: parse first, then detect/analyze, then report.
 ## Available Skills
 
 ### 1. log-parsing
-**File**: `skills/log-parsing/SKILL.md`
+**File**: `.github/skills/log-parsing/SKILL.md`
 **Invoke when**: user provides a log file path, says "parse", "read logs", "analyze log file"
 **Never invoke**: if no log file is mentioned
 
 ### 2. error-detection  
-**File**: `skills/error-detection/SKILL.md`
+**File**: `.github/skills/error-detection/SKILL.md`
 **Invoke when**: user asks for "errors", "failures", "exceptions", "what went wrong"
 **Requires**: log-parsing to have run first
 
 ### 3. pattern-analysis
-**File**: `skills/pattern-analysis/SKILL.md`  
+**File**: `.github/skills/pattern-analysis/SKILL.md`  
 **Invoke when**: user asks for "patterns", "anomalies", "trends", "spikes", "unusual behavior"
 **Requires**: log-parsing to have run first
 
 ### 4. report-generation
-**File**: `skills/report-generation/SKILL.md`
+**File**: `.github/skills/report-generation/SKILL.md`
 **Invoke when**: user asks for "report", "summary", "export", "show results"
 **Requires**: at least log-parsing to have run first
 

@@ -9,7 +9,7 @@ from typing import List, Dict, Any
 
 # Base paths
 PROJECT_ROOT = Path(__file__).parent.parent
-SKILLS_DIR = PROJECT_ROOT / "skills"
+SKILLS_DIR = PROJECT_ROOT / ".github" / "skills"
 TOOLS_DIR = PROJECT_ROOT / "tools"
 HOOKS_DIR = PROJECT_ROOT / "hooks"
 OUTPUTS_DIR = PROJECT_ROOT / "outputs"
