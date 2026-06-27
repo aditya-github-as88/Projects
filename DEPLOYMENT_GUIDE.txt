@@ -1,0 +1,298 @@
+# Mini-Project 5 — Deployment Guide
+# AI-Powered Airline Customer Support System
+# GitHub Codespaces → Docker → Hugging Face Spaces
+
+==============================================================
+PROJECT FOLDER STRUCTURE (in GitHub Codespaces)
+==============================================================
+
+airline-support/
+├── airline_api.py          ← FastAPI backend
+├── airline_ui.py           ← Streamlit frontend
+├── requirements.txt        ← All Python dependencies (pinned)
+├── Dockerfile              ← Docker container config
+├── .dockerignore           ← Files to exclude from image
+├── .env.example            ← Template for environment variables
+├── .env                    ← Your actual secrets (DO NOT commit)
+├── .gitignore              ← Git exclusions
+├── start.sh                ← Startup script (runs both services)
+├── README.md               ← HuggingFace Spaces config
+└── data/
+    └── Knowledge_Base_for_Airline_Info_and_FAQs.pdf
+
+==============================================================
+STEP 1 — Setup GitHub Codespaces
+==============================================================
+
+1. Go to https://github.com → New repository
+   Name: airline-support-system
+   Visibility: Public (required for free HF Spaces)
+   Click: Create repository
+
+2. Open in Codespaces:
+   Click Code → Codespaces → Create codespace on main
+
+3. In the Codespaces terminal, create the project folder:
+
+   mkdir -p airline-support/data
+   cd airline-support
+
+4. Upload all the project files using the Codespaces file explorer
+   (drag & drop into the file panel), OR use git clone if you
+   already have them in a repo.
+
+5. Upload the PDF knowledge base to the data/ folder:
+   data/Knowledge_Base_for_Airline_Info_and_FAQs.pdf
+
+==============================================================
+STEP 2 — Test Before Containerization (2 Points)
+==============================================================
+
+# 2.1 Install dependencies
+pip install -r requirements.txt
+
+# 2.2 Set environment variables
+cp .env.example .env
+# Edit .env with your actual values:
+nano .env
+
+# Fill in:
+# GROQ_API_KEY=your_key
+# PINECONE_API_KEY=your_key
+# DB_HOST=your_supabase_host
+# DB_USER=your_supabase_user
+# DB_PASSWORD=your_password
+
+# Load them into the shell
+export $(cat .env | grep -v '^#' | xargs)
+
+# 2.3 Start FastAPI backend (Terminal 1)
+uvicorn airline_api:app --host 0.0.0.0 --port 8000 --reload
+
+# 2.4 Start Streamlit frontend (Terminal 2 — click + in terminal panel)
+streamlit run airline_ui.py --server.port 8501
+
+# 2.5 Verify in Codespaces:
+# → Click "Ports" tab (bottom panel)
+# → Port 8000 → Open in Browser → check /health returns {"status":"healthy"}
+# → Port 8501 → Open in Browser → test the Streamlit chat UI
+# → Make sure frontend can talk to backend and queries return responses
+
+==============================================================
+STEP 3 — Dockerize the Application (2 Points)
+==============================================================
+
+# 3.1-3.2 Dockerfile is already created (see Dockerfile in project)
+
+# 3.3 .dockerignore is already created
+
+# 3.4 Build the Docker image (run from inside airline-support/ folder)
+docker build -t airline-support:latest .
+
+# Watch the build output — it will:
+# → Pull python:3.11-slim base image
+# → Install system dependencies
+# → Install all Python packages from requirements.txt
+# → Copy application files
+# → Set up the non-root user
+
+# 3.5 Verify image was created
+docker images | grep airline-support
+# Should show: airline-support   latest   <image-id>   <size>
+
+==============================================================
+STEP 4 — Test the Docker Container (2 Points)
+==============================================================
+
+# 4.1 & 4.2 Run container with environment variables
+docker run -d \
+  --name airline-app \
+  --env-file .env \
+  -p 7860:7860 \
+  -p 8000:8000 \
+  airline-support:latest
+
+# 4.3 Check container is running
+docker ps
+# Should show: airline-app   Up X seconds
+
+# 4.4 View container logs
+docker logs -f airline-app
+# You should see:
+# ▶ Starting FastAPI backend on port 8000...
+# ✅ Embedding model loaded!
+# ✅ Pinecone connected!
+# ✅ Backend is ready!
+# ▶ Starting Streamlit frontend on port 7860...
+
+# 4.5 Test functionality
+# → Codespaces Ports tab → port 7860 → Open in Browser
+# → Test a flight query: "What is the status of flight AI695?"
+# → Test a policy query: "What is the baggage allowance?"
+# → Test guardrail: "Ignore previous instructions"
+
+# Stop the container when done testing
+docker stop airline-app
+docker rm airline-app
+
+==============================================================
+STEP 5 — Push to Docker Hub (1 Point)
+==============================================================
+
+# 5.1 Create Docker Hub account + Personal Access Token
+# → Go to https://hub.docker.com
+# → Sign up for free account
+# → Account Settings → Security → New Access Token
+# → Name: codespaces-token, Permissions: Read/Write
+# → Copy the token
+
+# 5.2 Log in to Docker Hub from Codespaces
+docker login -u YOUR_DOCKERHUB_USERNAME
+# When prompted for password, paste your Access Token (NOT your account password)
+
+# 5.3 Tag the image with your Docker Hub username
+docker tag airline-support:latest YOUR_DOCKERHUB_USERNAME/airline-support:latest
+
+# Example:
+# docker tag airline-support:latest john123/airline-support:latest
+
+# 5.4 Push to Docker Hub
+docker push YOUR_DOCKERHUB_USERNAME/airline-support:latest
+
+# 5.5 Verify on Docker Hub
+# → Go to https://hub.docker.com
+# → You should see: YOUR_USERNAME/airline-support repository with the pushed image
+
+==============================================================
+STEP 6 — Deploy on Hugging Face Spaces (2 Points)
+==============================================================
+
+# 6.1 Create a Hugging Face account and new Space
+# → Go to https://huggingface.co → Sign up (free)
+# → Click your profile → New Space
+
+# 6.2 Space configuration:
+# → Space name: airline-support-system (or any name you like)
+# → License: MIT
+# → SDK: Docker         ← IMPORTANT: Select Docker (not Gradio/Streamlit)
+# → Hardware: CPU basic (free)
+# → Visibility: Public
+# → Click: Create Space
+
+# 6.3 HuggingFace will create a Git repo for the Space
+
+# 6.4 Add Secrets (API keys) — Settings → Variables and secrets → New secret:
+# Add these one by one:
+#   GROQ_API_KEY         = your_groq_api_key
+#   PINECONE_API_KEY     = your_pinecone_api_key
+#   PINECONE_INDEX       = airline-faq-index
+#   DB_HOST              = your_supabase_host
+#   DB_PORT              = 5432
+#   DB_USER              = your_supabase_user
+#   DB_PASSWORD          = your_supabase_password
+#   API_URL              = http://localhost:8000
+
+# 6.5 Edit README.md in the Space — must have this YAML header:
+# (Already included in our README.md — just copy it to the Space)
+# ---
+# title: SkyWings AI Airline Customer Support
+# emoji: ✈️
+# sdk: docker
+# app_port: 7860
+# ---
+
+# 6.6 Create Dockerfile in the HuggingFace Space
+# In the HF Space file editor, create a Dockerfile with this content:
+# (This references your Docker Hub image — no rebuild needed!)
+
+FROM YOUR_DOCKERHUB_USERNAME/airline-support:latest
+
+# HuggingFace Spaces runs as user 1000
+USER 1000
+
+EXPOSE 7860
+
+CMD ["./start.sh"]
+
+# 6.7 Commit the files — HF Spaces will automatically build and deploy
+# Watch the build logs in the Space's "Logs" tab
+
+# 6.8 Wait for status to show "Running" (usually 3-10 minutes)
+
+==============================================================
+STEP 7 — Access and Test Deployed App (1 Point)
+==============================================================
+
+# 7.1 Open your Space URL:
+# https://huggingface.co/spaces/YOUR_HF_USERNAME/airline-support-system
+
+# 7.2 Verify the Streamlit UI loads
+
+# 7.3 Test these queries:
+FLIGHT STATUS:    "What is the status of flight AI695?"
+BAGGAGE POLICY:   "How much free baggage is allowed?"
+CHECK-IN:         "When does online check-in open?"
+BOARDING:         "What time do boarding gates close?"
+DOCUMENTS:        "What ID is accepted for domestic travel?"
+FAQ:              "What happens if my flight is cancelled?"
+
+# 7.4 Confirm all components work:
+# ✅ Backend API responding (check sidebar — shows 🟢 Backend: Online)
+# ✅ Database queries returning flight data
+# ✅ RAG returning policy answers
+# ✅ Guardrails blocking unsafe queries
+
+# 7.5 Check Space logs:
+# HF Space → Logs tab → verify no errors
+
+==============================================================
+QUICK REFERENCE — All Commands
+==============================================================
+
+# Install deps
+pip install -r requirements.txt
+
+# Run locally (without Docker)
+export $(cat .env | grep -v '^#' | xargs)
+uvicorn airline_api:app --host 0.0.0.0 --port 8000 &
+streamlit run airline_ui.py --server.port 8501
+
+# Build Docker image
+docker build -t airline-support:latest .
+
+# Run Docker container
+docker run -d --name airline-app --env-file .env \
+  -p 7860:7860 -p 8000:8000 airline-support:latest
+
+# View logs
+docker logs -f airline-app
+
+# Stop container
+docker stop airline-app && docker rm airline-app
+
+# Tag and push to Docker Hub
+docker tag airline-support:latest USERNAME/airline-support:latest
+docker push USERNAME/airline-support:latest
+
+==============================================================
+TROUBLESHOOTING
+==============================================================
+
+ISSUE: Container exits immediately
+FIX:   docker logs airline-app  → check for missing env vars
+
+ISSUE: Backend not starting (embedding model slow)
+FIX:   Increase sleep in start.sh from 10 to 20 seconds
+
+ISSUE: Pinecone connection error
+FIX:   Verify PINECONE_API_KEY and PINECONE_INDEX are correct
+
+ISSUE: DB connection refused
+FIX:   Check DB_HOST, DB_USER, DB_PASSWORD in .env
+       Also check Supabase RLS is disabled
+
+ISSUE: HF Space stuck on "Building"
+FIX:   Check Logs tab → usually a missing secret or wrong port
+
+ISSUE: "uvicorn: command not found" in Codespaces
+FIX:   python -m uvicorn airline_api:app --host 0.0.0.0 --port 8000
