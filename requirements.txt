@@ -1,13 +1,16 @@
 # ── Core LangChain Ecosystem ──────────────────────────────────────────────────
 langchain==0.3.14
-langchain-core==0.3.40
+# langchain-core: do NOT pin — let pip resolve automatically.
+# langchain==0.3.14 needs langchain-core>=0.3.29,<0.4.0
+# langchain-pinecone==0.2.4 needs langchain-core>=0.3.34
+# Pinning to 0.3.40 (your original) breaks because it predates langchain-pinecone's minimum.
+# Pinning to 0.3.86 (latest 0.3.x) breaks langchain==0.3.14's <0.4.0 upper bound.
+# Let pip find the highest compatible version in the >=0.3.34,<0.4.0 window.
 langchain-community==0.3.14
 langchain-openai==0.3.12
 langchain-huggingface==0.1.2
 langchain-text-splitters==0.3.8
-langchain-experimental==0.3.4
 langchain-pinecone==0.2.4
-langchainhub
 
 # ── LangGraph ─────────────────────────────────────────────────────────────────
 langgraph==0.3.5
@@ -19,7 +22,10 @@ openai
 sentence-transformers==3.4.1
 
 # ── Vector Store ──────────────────────────────────────────────────────────────
-pinecone==7.3.0
+# CHANGED: pinecone==7.3.0 → pinecone==6.0.2
+# langchain-pinecone==0.2.4 requires pinecone>=6.0.0,<7.0.0.
+# pinecone 7.x is outside that range and causes a hard conflict.
+pinecone==6.0.2
 
 # ── Database ──────────────────────────────────────────────────────────────────
 psycopg2-binary
