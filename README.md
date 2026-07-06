@@ -1,8 +1,26 @@
-# AI Agentic Customer Support Platform — How It Works
+---
+title: "AI Agentic Customer Support Platform"
+subtitle: "How It Works"
+output: html_document
+---
+
+# 🤖 AI Agentic Customer Support Platform — How It Works
 
 This document walks through **exactly what happens, step by step**, when you run `main_simulation.py`. No jargon — just what gets called, what goes in, what comes out, and why each step exists. If you read nothing else in this project, read this.
 
 Think of `main_simulation.py` as a stage director: it wakes up every actor (service/agent), hands them a script (sample customer messages), and lets you watch the whole play unfold in your terminal.
+
+---
+
+## 📑 Table of Contents
+
+1. [The cast of characters](#1-the-cast-of-characters)
+2. [Startup: stocking the shelves (Data Ingestion)](#2-startup-stocking-the-shelves-data-ingestion)
+3. [Hiring the staff: Agents and the Orchestrator](#3-hiring-the-staff-agents-and-the-orchestrator)
+4. [A single customer interaction, start to finish](#4-a-single-customer-interaction-start-to-finish)
+5. [Workflow diagram](#5-workflow-diagram)
+6. [What the whole simulation actually demonstrates](#6-what-the-whole-simulation-actually-demonstrates)
+7. [Where to look if you want to see the code yourself](#7-where-to-look-if-you-want-to-see-the-code-yourself)
 
 ---
 
@@ -41,19 +59,19 @@ Before any customer can be helped, the "store" needs stock — a knowledge base 
 
 **Output:** A list of `CleanedCustomerConversation` records, and the chunks are now searchable in the knowledge base.
 
-**Why it matters:** Later, when a customer asks "what's your return policy," the system needs *something* to search. This step is what makes that search possible — and doing the PII-masking here (at ingestion time, not later) means sensitive data never even gets a chance to leak downstream.
+> 💡 **Why it matters:** Later, when a customer asks "what's your return policy," the system needs *something* to search. This step is what makes that search possible — and doing the PII-masking here (at ingestion time, not later) means sensitive data never even gets a chance to leak downstream.
 
 ### 2b. Product catalogue → `pipeline.ingest_product_catalog(raw_products)`
 
 Same idea, but for products: descriptions, specs, and customer reviews. Reviews go through PII-masking too — the sample data even has a review that mentions someone's name (`"...Jane Smith recommended it to me!"`), which gets masked exactly like a conversation would.
 
-**Why it matters:** This is what lets `ProductRecommendationAgent` later "know about" the gaming laptop, headphones, and smartwatch in the sample catalogue.
+> 💡 **Why it matters:** This is what lets `ProductRecommendationAgent` later "know about" the gaming laptop, headphones, and smartwatch in the sample catalogue.
 
 ### 2c. Company policies → `pipeline.ingest_policy_documents(policies)`
 
 Plain policy text (returns, warranty, shipping) gets chunked and stored the same way.
 
-**Why it matters:** This is what lets `ReturnsAgent` and `GeneralPurposeAgent` answer policy questions accurately instead of guessing.
+> 💡 **Why it matters:** This is what lets `ReturnsAgent` and `GeneralPurposeAgent` answer policy questions accurately instead of guessing.
 
 ### (Optional) 2d. Real-world Twitter support data → `pipeline.ingest_twitter_support_csv(csv_path)`
 
@@ -113,7 +131,7 @@ The orchestrator builds an `AgentTask` (a small package containing the question,
 4. It interprets that raw data — is anything wrong with this order? (Here: no, it shipped fine.)
 5. It packages everything into a `StructuredOrderSummary` — a clean, predictable shape that any downstream code can rely on, regardless of what the AI happened to say.
 
-**If something goes wrong here** — the agent can't find the order, the AI itself gets stuck, or any unhandled error occurs — the orchestrator automatically falls back to `EscalationAgent`, which prepares a summary for a human to take over. No customer message is ever silently dropped.
+> ⚠️ **If something goes wrong here** — the agent can't find the order, the AI itself gets stuck, or any unhandled error occurs — the orchestrator automatically falls back to `EscalationAgent`, which prepares a summary for a human to take over. No customer message is ever silently dropped.
 
 ### Step 5 — Turn the structured result into a human sentence
 The `StructuredOrderSummary` from Step 4 gets sent to `LLMInferenceService.call_generative()`, along with the conversation history. This is the only step whose entire job is *wording* — turning `status: Shipped, estimated_delivery: 2024-08-10` into an actual warm sentence a customer would want to read.
