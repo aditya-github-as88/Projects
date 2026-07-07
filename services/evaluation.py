@@ -118,7 +118,7 @@ def _apply_ragas_compat_shim() -> None:
                     "calls instead (already done in services/evaluation.py)."
                 )
 
-        stub.ChatVertexAI = ChatVertexAI
+        setattr(stub, "ChatVertexAI", ChatVertexAI)
         sys.modules[module_name] = stub
         logger.debug("[Evaluation] Applied RAGAS/langchain-community compatibility shim.")
 
@@ -298,7 +298,7 @@ class EvaluationService:
         dataset = Dataset.from_dict(
             {"question": questions, "contexts": contexts, "ground_truth": ground_truths}
         )
-        result = evaluate(
+        result = evaluate(  # type: ignore[arg-type]
             dataset, metrics=[context_recall, context_precision], llm=llm, embeddings=embeddings
         )
         return float(result["context_recall"]), float(result["context_precision"])
@@ -333,7 +333,7 @@ class EvaluationService:
 
         llm, embeddings = _build_ragas_llm_and_embeddings()
         dataset = Dataset.from_dict({"question": questions, "answer": answers, "contexts": contexts})
-        result = evaluate(dataset, metrics=[faithfulness], llm=llm, embeddings=embeddings)
+        result = evaluate(dataset, metrics=[faithfulness], llm=llm, embeddings=embeddings)  # type: ignore[arg-type]
         return float(result["faithfulness"])
 
     # ──────────────────────────────────────────────────────────────────────────
@@ -366,7 +366,7 @@ class EvaluationService:
 
         llm, embeddings = _build_ragas_llm_and_embeddings()
         dataset = Dataset.from_dict({"question": questions, "answer": answers, "contexts": contexts})
-        result = evaluate(dataset, metrics=[answer_relevancy], llm=llm, embeddings=embeddings)
+        result = evaluate(dataset, metrics=[answer_relevancy], llm=llm, embeddings=embeddings)  # type: ignore[arg-type]
         return float(result["answer_relevancy"])
 
     # ──────────────────────────────────────────────────────────────────────────
@@ -385,8 +385,13 @@ class EvaluationService:
         fetched, returns a metric with value=None rather than crashing.
         """
         try:
+            from typing import cast
+
+            import torch
             from bert_score import score as bert_score
+
             _, _, f1 = bert_score(candidates, references, lang=lang, verbose=False)
+            f1 = cast(torch.Tensor, f1)
         except ImportError as exc:
             note = f"bert-score not installed ({exc}). Run: pip install bert-score"
             logger.warning("[Evaluation] %s", note)

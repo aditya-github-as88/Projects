@@ -17,7 +17,7 @@ Benefits over the raw-API version:
 """
 
 import logging
-from typing import Optional
+from typing import Optional, cast
 
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
@@ -145,9 +145,9 @@ class LLMInferenceService:
             for m in request.conversation_history[-6:]
         )
         try:
-            result: _RouterOutput = self._router_chain.invoke(
+            result = cast(_RouterOutput, self._router_chain.invoke(
                 {"history": history_text, "query": request.current_query}
-            )
+            ))
             params = {"reason": result.reason}
             if result.order_id:
                 params["order_id"] = result.order_id
@@ -213,14 +213,14 @@ class LLMInferenceService:
 
         try:
             chain = self._REASON_PROMPT | self._reason_llm.with_structured_output(_AgentReasonOutput)
-            result: _AgentReasonOutput = chain.invoke(
+            result = cast(_AgentReasonOutput, chain.invoke(
                 {
                     "agent_name": request.agent_name,
                     "task_description": request.task_description,
                     "current_state": request.current_state,
                     "available_tools": request.available_tools,
                 }
-            )
+            ))
             return LLMAgentReasonResponse(
                 action=result.action,
                 tool_name=result.tool_name,
@@ -282,13 +282,13 @@ class LLMInferenceService:
             chain = self._INTERPRET_PROMPT | self._interpret_llm.with_structured_output(
                 _AgentInterpretOutput
             )
-            result: _AgentInterpretOutput = chain.invoke(
+            result = cast(_AgentInterpretOutput, chain.invoke(
                 {
                     "agent_name": request.agent_name,
                     "goal": request.interpretation_goal,
                     "raw_data": request.raw_data,
                 }
-            )
+            ))
             data = result.model_dump(exclude_none=True, exclude={"thought"})
             return LLMAgentInterpretResponse(structured_interpretation=data, thought=result.thought)
         except Exception as exc:

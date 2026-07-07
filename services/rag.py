@@ -27,7 +27,10 @@ Embeddings provider:
 """
 
 import logging
-from typing import Optional
+from typing import Optional, TYPE_CHECKING, Union, cast
+
+if TYPE_CHECKING:
+    from langchain_community.vectorstores import FAISS
 
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
@@ -140,6 +143,7 @@ class RAGService:
         self._embeddings = get_embeddings_model()
         self._backend = VECTOR_STORE.lower()
 
+        self._vectorstore: Union[Chroma, "FAISS"]
         if self._backend == "faiss":
             self._vectorstore = self._init_faiss()
         else:
@@ -162,7 +166,7 @@ class RAGService:
             collection_metadata={"hnsw:space": "cosine"},
         )
 
-    def _init_faiss(self):
+    def _init_faiss(self) -> "FAISS":
         """
         FAISS backend (per Tech Stack: "ChromaDB / FAISS"). Loads an existing
         index from FAISS_PERSIST_DIR if present, otherwise starts empty and
@@ -189,7 +193,7 @@ class RAGService:
 
     def _persist_faiss(self) -> None:
         if self._backend == "faiss":
-            self._vectorstore.save_local(FAISS_PERSIST_DIR)
+            cast("FAISS", self._vectorstore).save_local(FAISS_PERSIST_DIR)
 
     # ──────────────────────────────────────────────────────────────────────────
     # Ingestion
@@ -338,9 +342,8 @@ class RAGService:
         try:
             if self._backend == "faiss":
                 # Subtract the placeholder seed vector if the index is otherwise empty
-                total = self._vectorstore.index.ntotal
-                return total
-            return self._vectorstore._collection.count()
+                return cast("FAISS", self._vectorstore).index.ntotal
+            return cast(Chroma, self._vectorstore)._collection.count()
         except Exception:
             return 0
 

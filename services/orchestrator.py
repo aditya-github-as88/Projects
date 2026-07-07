@@ -90,7 +90,10 @@ class AgentOrchestratorService:
         the rest of the pipeline (RoutingRequest, NLGRequest) expects."""
         role_map = {"human": "user", "ai": "assistant", "system": "system"}
         return [
-            {"role": role_map.get(m.type, m.type), "content": m.content}
+            {
+                "role": role_map.get(m.type, m.type),
+                "content": m.content if isinstance(m.content, str) else str(m.content),
+            }
             for m in history.messages
         ]
 

@@ -21,10 +21,14 @@ import re
 import uuid
 import hashlib
 import logging
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 from common.config import PII_MASKER_MODE
 from common.models import MaskedQuery
+
+if TYPE_CHECKING:
+    from presidio_analyzer import AnalyzerEngine
+    from presidio_anonymizer import AnonymizerEngine
 
 logger = logging.getLogger(__name__)
 
@@ -73,8 +77,8 @@ def _mask_with_regex(text: str) -> str:
 # ---------------------------------------------------------------------------
 # Presidio backend (loaded lazily so regex mode has zero import overhead)
 # ---------------------------------------------------------------------------
-_presidio_analyzer = None
-_presidio_anonymizer = None
+_presidio_analyzer: Optional["AnalyzerEngine"] = None
+_presidio_anonymizer: Optional["AnonymizerEngine"] = None
 
 
 def _get_presidio():
@@ -101,7 +105,11 @@ def _mask_with_presidio(text: str) -> str:
     """Use Microsoft Presidio for NLP-based PII detection and anonymisation."""
     analyzer, anonymizer = _get_presidio()
     results = analyzer.analyze(text=text, language="en")
-    anonymized = anonymizer.anonymize(text=text, analyzer_results=results)
+    # NOTE: presidio-analyzer's RecognizerResult and presidio-anonymizer's
+    # RecognizerResult are structurally identical but distinct classes across
+    # the two packages, so static type-checkers (Pylance/mypy) flag this as
+    # invariant-list mismatch even though it works correctly at runtime.
+    anonymized = anonymizer.anonymize(text=text, analyzer_results=results)  # type: ignore[arg-type]
     return anonymized.text
 
 
