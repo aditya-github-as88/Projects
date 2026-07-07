@@ -66,10 +66,11 @@ def _build_groq(max_tokens: int, temperature: float) -> Optional[BaseChatModel]:
         logger.warning("[LLMFactory] GROQ_API_KEY not set — Groq model unavailable.")
         return None
     from langchain_groq import ChatGroq
+    from pydantic import SecretStr
 
     return ChatGroq(
         model=GROQ_MODEL,
-        api_key=GROQ_API_KEY,
+        api_key=SecretStr(GROQ_API_KEY),
         max_tokens=max_tokens,
         temperature=temperature,
     )
@@ -100,6 +101,7 @@ def _build_ollama(max_tokens: int, temperature: float) -> Optional[BaseChatModel
         base_url=OLLAMA_BASE_URL,
         temperature=temperature,
         num_predict=max_tokens,
+        stop=None,
     )
 
 
@@ -110,8 +112,10 @@ def _build_anthropic(max_tokens: int, temperature: float) -> Optional[BaseChatMo
     from langchain_anthropic import ChatAnthropic
 
     return ChatAnthropic(
-        model=LLM_MODEL,
+        model_name=LLM_MODEL,
         api_key=ANTHROPIC_API_KEY,
-        max_tokens=max_tokens,
+        max_tokens_to_sample=max_tokens,
         temperature=temperature,
+        timeout=None,
+        stop=None,
     )
