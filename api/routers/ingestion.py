@@ -80,7 +80,7 @@ async def ingest_twitter_csv(
     into the RAG knowledge base. See `DataIngestionPipeline.ingest_twitter_support_csv`
     for the inbound/outbound tweet-pairing logic.
     """
-    if not file.filename.endswith(".csv"):
+    if not file.filename or not file.filename.endswith(".csv"):
         raise HTTPException(status_code=400, detail="File must be a .csv")
 
     try:
