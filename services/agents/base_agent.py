@@ -29,7 +29,8 @@ from typing import Any, Optional
 
 from langchain.agents import create_agent
 from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_core.messages import AIMessage, ToolMessage
+from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+from langchain_core.runnables import RunnableConfig
 from langgraph.checkpoint.memory import InMemorySaver
 
 from clients.ecommerce_api_client import MockECommerceAPIClient
@@ -142,11 +143,11 @@ class BaseAgent(ABC):
         if self._agent_graph is None:
             raise RuntimeError(f"[{self.name}] Agent graph unavailable (no API key).")
 
-        config = {"configurable": {"thread_id": task.session_id}}
+        config: RunnableConfig = {"configurable": {"thread_id": task.session_id}}
         logger.info("[%s] Invoking agent graph | thread_id=%s", self.name, task.session_id)
 
         result = self._agent_graph.invoke(
-            {"messages": [("user", task_instruction)]},
+            {"messages": [HumanMessage(content=task_instruction)]},
             config=config,
         )
 
